@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 
 const Navbar = () => {
@@ -24,6 +24,24 @@ const Navbar = () => {
     { name: 'Testimonials', href: '#testimonials' },
     { name: 'FAQ', href: '#faq' },
   ];
+
+  const handleMobileNavClick = (href) => {
+    // Small delay to ensure the click event fully completes before closing the menu
+    setTimeout(() => {
+      setIsMobileMenuOpen(false);
+    }, 300);
+    
+    // Smoothly scroll to the section
+    const targetId = href.substring(1);
+    const targetElement = document.getElementById(targetId);
+    
+    if (targetElement) {
+      window.scrollTo({
+        top: targetElement.offsetTop - 100,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <motion.nav
@@ -87,35 +105,35 @@ const Navbar = () => {
       </div>
 
       {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: 'auto' }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden glass-card mt-2 mx-4 rounded-2xl overflow-hidden backdrop-blur-xl"
-        >
-          <div className="flex flex-col py-4 space-y-4 px-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.name}
-                href={link.href}
-                className="text-light hover:text-primary-400 text-base font-medium transition-colors duration-300"
-                onClick={() => setIsMobileMenuOpen(false)}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden glass-card mt-2 mx-4 rounded-2xl overflow-hidden backdrop-blur-xl"
+          >
+            <div className="flex flex-col py-4 space-y-4 px-4">
+              {navLinks.map((link) => (
+                <button
+                  key={link.name}
+                  onClick={() => handleMobileNavClick(link.href)}
+                  className="text-left text-light hover:text-primary-400 text-base font-medium transition-colors duration-300"
+                >
+                  {link.name}
+                </button>
+              ))}
+              <button
+                onClick={() => handleMobileNavClick('#enroll')}
+                className="btn-primary text-base w-full text-center"
               >
-                {link.name}
-              </a>
-            ))}
-            <a
-              href="#enroll"
-              className="btn-primary text-base w-full text-center"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Enroll Now
-            </a>
-          </div>
-        </motion.div>
-      )}
+                Enroll Now
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 };
